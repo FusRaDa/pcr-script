@@ -49,7 +49,7 @@ def create_input_file():
         codes_sheet['A3'] = "assay2"
         codes_sheet['A4'] = "assay3"
 
-        samples_sheet.conditional_formatting.add('A2:C1048576',
+        samples_sheet.conditional_formatting.add('A2:C5000',
                                                  FormulaRule(formula=['NOT(ISBLANK(A2))'],
                                                              stopIfTrue=True,
                                                              fill=cell_value))
@@ -80,15 +80,41 @@ def create_input_file():
 
 create_input_file()
 
-# read input.xlsx
-input_file = openpyxl.load_workbook('input.xlsx')
 
-samples = input_file['Samples']
-codes = input_file['Codes']
+def get_samples_list():
+    # read input.xlsx
+    input_file = openpyxl.load_workbook('input.xlsx')
 
-cell = samples['A3']
+    samples = input_file['Samples']
 
-print(cell.value)
-print(samples.max_row)
+    ext_array = []
+    sample_array = []
+    assay_array = []
+
+    samples_list = []
+
+    for row in range(2, samples.max_row + 1):
+        ext_array.append(samples.cell(row=row, column=1).value)
+
+    for row in range(2, samples.max_row + 1):
+        sample_array.append(samples.cell(row=row, column=2).value)
+
+    for row in range(2, samples.max_row + 1):
+        assay_array.append(samples.cell(row=row, column=3).value)
+
+    for i in range(len(ext_array)):
+        dict_obj = {'ext': ext_array[i], 'id': sample_array[i], 'code': assay_array[i]}
+        samples_list.append(dict_obj)
+
+    return samples_list
+
+
+
+
+
+
+
+
+
 
 
