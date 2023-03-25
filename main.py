@@ -1,15 +1,17 @@
 from openpyxl.styles import PatternFill
 from openpyxl.formatting.rule import FormulaRule
+from openpyxl.worksheet.datavalidation import DataValidation
 
 import openpyxl
 import os.path
 
+# check if input file exists in program, if not create it
+path = './input.xlsx'
+check_file = os.path.isfile(path)
+
 
 # create input.xlsx as interface
 def create_input_file():
-    # check if input file exists in program, if not create it
-    path = './input.xlsx'
-    check_file = os.path.isfile(path)
 
     if not check_file:
         wb = openpyxl.Workbook()
@@ -54,31 +56,100 @@ def create_input_file():
                                                              stopIfTrue=True,
                                                              fill=cell_value))
 
-        codes_sheet.conditional_formatting.add('B1:ZZ1',
-                                               FormulaRule(formula=['NOT(ISBLANK(B1))'],
-                                                           stopIfTrue=True,
-                                                           fill=assay_code))
+        # codes_sheet.conditional_formatting.add('B1:ZZ1',
+        #                                        FormulaRule(formula=['NOT(ISBLANK(B1))'],
+        #                                                    stopIfTrue=True,
+        #                                                    fill=assay_code))
+        #
+        # codes_sheet.conditional_formatting.add('A2:A5000',
+        #                                        FormulaRule(formula=['NOT(ISBLANK(A2))'],
+        #                                                    stopIfTrue=True,
+        #                                                    fill=assay_name))
+        #
+        # last_cell_row = codes_sheet.max_row
+        # last_cell_col = codes_sheet.max_column
+        #
+        # last_cell = codes_sheet.cell(last_cell_row, last_cell_col).coordinate
+        # editing_area = "B2:" + last_cell
+        #
+        # no = PatternFill(start_color='00FF0000', end_color='00FF0000', fill_type='solid')
+        # yes = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+        #
+        # codes_sheet.conditional_formatting.add(editing_area,
+        #                                        FormulaRule(formula=['IF(B2="N", "True", "")'],
+        #                                                    stopIfTrue=True,
+        #                                                    fill=no))
+        #
+        # codes_sheet.conditional_formatting.add(editing_area,
+        #                                        FormulaRule(formula=['IF(B2="Y", "True", "")'],
+        #                                                    stopIfTrue=True,
+        #                                                    fill=yes))
+        #
+        # dv = DataValidation(type='list', formula1='"Y,N"', allow_blank=False, showDropDown=False, showErrorMessage=True)
+        # dv.error = "Invalid Entry - Use Dropdown"
+        #
+        # dv.add(editing_area)
+        #
+        # codes_sheet.add_data_validation(dv)
 
-        codes_sheet.conditional_formatting.add('A2:A5000',
-                                               FormulaRule(formula=['NOT(ISBLANK(A2))'],
-                                                           stopIfTrue=True,
-                                                           fill=assay_name))
+        wb.save(path)
 
-        last_cell_row = codes_sheet.max_row
-        last_cell_col = codes_sheet.max_column
 
-        last_cell = codes_sheet.cell(last_cell_row, last_cell_col).coordinate
-        editing_area = "B2:" + last_cell
+def update_codes_sheet():
+    input_file = openpyxl.load_workbook('input.xlsx')
 
-        codes_sheet.conditional_formatting.add(editing_area,
-                                               FormulaRule(formula=['NOT(ISBLANK(B2))'],
-                                                           stopIfTrue=True,
-                                                           fill=assay_name))
+    assay_name = PatternFill(start_color='00C0C0C0', end_color='00C0C0C0', fill_type='solid')
+    assay_code = PatternFill(start_color='00C0C0C0', end_color='00C0C0C0', fill_type='solid')
 
-        wb.save(filename='input.xlsx')
+    codes_sheet = input_file['Codes']
+
+    codes_sheet.conditional_formatting.add('B1:ZZ1',
+                                           FormulaRule(formula=['NOT(ISBLANK(B1))'],
+                                                       stopIfTrue=True,
+                                                       fill=assay_code))
+
+    codes_sheet.conditional_formatting.add('A2:A5000',
+                                           FormulaRule(formula=['NOT(ISBLANK(A2))'],
+                                                       stopIfTrue=True,
+                                                       fill=assay_name))
+
+    last_cell_row = codes_sheet.max_row
+    last_cell_col = codes_sheet.max_column
+
+    last_cell = codes_sheet.cell(last_cell_row, last_cell_col).coordinate
+    editing_area = "B2:" + last_cell
+
+    no = PatternFill(start_color='00FF0000', end_color='00FF0000', fill_type='solid')
+    yes = PatternFill(start_color='0000FF00', end_color='0000FF00', fill_type='solid')
+
+    codes_sheet.conditional_formatting.add(editing_area,
+                                           FormulaRule(formula=['IF(B2="N", "True", "")'],
+                                                       stopIfTrue=True,
+                                                       fill=no))
+
+    codes_sheet.conditional_formatting.add(editing_area,
+                                           FormulaRule(formula=['IF(B2="Y", "True", "")'],
+                                                       stopIfTrue=True,
+                                                       fill=yes))
+
+    dv = DataValidation(type='list', formula1='"Y,N"', allow_blank=False, showDropDown=False, showErrorMessage=True)
+    dv.error = "Invalid Entry - Use Dropdown"
+
+    dv.add(editing_area)
+
+    codes_sheet.add_data_validation(dv)
+
+    input_file.save(path)
 
 
 create_input_file()
+
+update_codes_sheet()
+
+
+
+
+
 
 
 def get_samples_list():
@@ -107,14 +178,3 @@ def get_samples_list():
         samples_list.append(dict_obj)
 
     return samples_list
-
-
-
-
-
-
-
-
-
-
-
