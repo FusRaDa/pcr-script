@@ -1,5 +1,9 @@
-import json
 import openpyxl
+from openpyxl.styles import PatternFill
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Alignment
+
+output_path = './pcr_paperwork.xlsx'
 
 
 def get_codes_sheet_json():
@@ -37,13 +41,6 @@ def get_codes_sheet_json():
 
     return full_data
 
-    # file_name = 'assay_data.json'
-    # with open(file_name, 'w') as empty_json:
-    #     json.dump(full_data, empty_json, indent=4)
-    #     empty_json.close()
-
-print(get_codes_sheet_json())
-
 
 def get_samples_list():
     # read input.xlsx
@@ -71,3 +68,32 @@ def get_samples_list():
         samples_list.append(dict_obj)
 
     return samples_list
+
+
+def generate_pcr_paperwork():
+
+    plate_number = 1
+
+    wb = openpyxl.Workbook()
+    sheet = wb['Sheet']
+    sheet.title = "Plate " + str(plate_number)
+
+    for col in range(3, 15):
+        sheet.column_dimensions[get_column_letter(col)].width = 13
+
+        sheet.cell(row=2, column=col).value = col - 2
+
+    plate_letters = ["A", "B", "C", "D", "E", "F", "G", "H"]
+
+    for row in range(3, 11):
+        sheet.row_dimensions[row].height = 50
+        sheet.cell(row=row, column=2).value = plate_letters[row-3]
+
+
+
+    wb.save(output_path)
+
+
+generate_pcr_paperwork()
+
+
