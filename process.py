@@ -70,13 +70,15 @@ def get_samples_list():
     return samples_list
 
 
-def generate_pcr_paperwork():
+def generate_pcr_plate_sheet():
 
     plate_number = 1
 
     wb = openpyxl.Workbook()
     sheet = wb['Sheet']
     sheet.title = "Plate " + str(plate_number)
+
+    sheet.column_dimensions['B'].width = 5
 
     for col in range(3, 15):
         sheet.column_dimensions[get_column_letter(col)].width = 13
@@ -89,11 +91,29 @@ def generate_pcr_paperwork():
         sheet.row_dimensions[row].height = 50
         sheet.cell(row=row, column=2).value = plate_letters[row-3]
 
-
+    for row in range(3, 11):
+        for col in range(3, 15):
+            sheet.cell(row=row, column=col).alignment = Alignment(wrap_text=True)
 
     wb.save(output_path)
 
 
-generate_pcr_paperwork()
+generate_pcr_plate_sheet()
+
+
+def get_plate_wells():
+    plate_number = 1
+
+    wb = openpyxl.load_workbook(output_path)
+    sheet = wb["Plate " + str(plate_number)]
+
+    plate_wells = []
+
+    for row in range(3, 11):
+        for col in range(3, 15):
+            plate_wells.append(sheet.cell(row=row, column=col).coordinate)
+
+
+get_plate_wells()
 
 
